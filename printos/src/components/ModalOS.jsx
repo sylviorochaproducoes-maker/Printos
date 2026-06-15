@@ -1,19 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { STATUS_FLUXO, somarTam, fmtData } from "../utils/helpers";
 import Badge from "./Badge";
 import BarraProgresso from "./BarraProgresso";
 
-export default function ModalOS({ os, usuario, fechar, atualizar }) {
+export default function ModalOS({ os, usuario, fechar, atualizar, usuarios = [] }) {
   const [status, setStatus] = useState(os.status);
+  const [colaboradorId, setColaboradorId] = useState(os.colaboradorId || "");
   const [salvo, setSalvo] = useState(false);
+
   const podeEditar = usuario.papel !== "cliente";
+  const eConfeccao = usuario.papel === "confeccao";
+
+  // Sincroniza o estado local quando a OS muda
+  useEffect(() => {
+    setStatus(os.status);
+    setColaboradorId(os.colaboradorId || "");
+  }, [os]);
+
+  // Filtrar colaboradores da mesma confecção
+  const colaboradoresEmpresa = usuarios.filter(
+    u => u.papel === "colaborador" && (u.companyIds && u.companyIds.includes(usuario.companyId))
+  );
 
   const salvar = () => {
-    const upd = { ...os, status };
+    let colabNome = os.colaboradorNome || "";
+    if (colaboradorId) {
+      const colabObj = colaboradoresEmpresa.find(c => c.id === +colaboradorId);
+      if (colabObj) colabNome = colabObj.nome;
+    } else {
+      colabNome = "";
+    }
+
+    const upd = {
+      ...os,
+      status,
+      colaboradorId: colaboradorId ? +colaboradorId : "",
+      colaboradorNome: colabNome
+    };
+
     atualizar(upd);
     setSalvo(true);
     setTimeout(() => setSalvo(false), 1800);
   };
+
+  const statusAlterado = status !== os.status;
+  const colabAlterado = eConfeccao && (+colaboradorId !== +(os.colaboradorId || 0));
 
   const pares = Object.entries(os.tamanhos || {}).filter(([, v]) => +v > 0);
 
@@ -34,18 +65,32 @@ export default function ModalOS({ os, usuario, fechar, atualizar }) {
 
         <div className="p-6 space-y-6">
           {podeEditar && (
-            <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-end justify-between gap-4">
-              <div className="flex-1">
-                <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Atualizar Status</p>
-                <select value={status} onChange={e => setStatus(e.target.value)}
-                  className="w-full border border-indigo-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                  {STATUS_FLUXO.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
+            <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 space-y-4 animate-in fade-in duration-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Atualizar Status</p>
+                  <select value={status} onChange={e => setStatus(e.target.value)}
+                    className="w-full border border-indigo-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-800 font-medium">
+                    {STATUS_FLUXO.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                {eConfeccao && (
+                  <div>
+                    <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1.5">Colaborador Responsável</p>
+                    <select value={colaboradorId} onChange={e => setColaboradorId(e.target.value)}
+                      className="w-full border border-indigo-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-800 font-medium">
+                      <option value="">Não atribuído</option>
+                      {colaboradoresEmpresa.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                    </select>
+                  </div>
+                )}
               </div>
-              <button onClick={salvar} disabled={status === os.status && !salvo}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${salvo ? "bg-emerald-500 text-white" : "bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white shadow-md shadow-indigo-200"}`}>
-                {salvo ? "✓ Salvo!" : "Salvar"}
-              </button>
+              <div className="flex justify-end pt-1">
+                <button onClick={salvar} disabled={!statusAlterado && !colabAlterado && !salvo}
+                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${salvo ? "bg-emerald-500 text-white" : "bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white shadow-md shadow-indigo-200"}`}>
+                  {salvo ? "✓ Salvo com sucesso!" : "Salvar Alterações"}
+                </button>
+              </div>
             </div>
           )}
 
@@ -59,6 +104,7 @@ export default function ModalOS({ os, usuario, fechar, atualizar }) {
               ["Gola", os.gola],
               ["Manga", os.manga],
               ["Estampa", os.estampa],
+              ["Responsável", os.colaboradorNome || "Não atribuído"]
             ].filter(Boolean).map(([k, v]) => (
               <div key={k} className="space-y-0.5">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{k}</p>

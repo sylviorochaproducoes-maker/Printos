@@ -70,7 +70,19 @@ export default function App() {
 
   const handleAddUser = (novoUsuario) => {
     setUsuarios((prev) => {
-      const upd = [...prev, novoUsuario];
+      const exists = prev.some(
+        (u) =>
+          u.id === novoUsuario.id ||
+          u.login.toLowerCase() === novoUsuario.login.toLowerCase()
+      );
+      const upd = exists
+        ? prev.map((u) =>
+            u.id === novoUsuario.id ||
+            u.login.toLowerCase() === novoUsuario.login.toLowerCase()
+              ? { ...u, ...novoUsuario, companyIds: novoUsuario.companyIds || u.companyIds }
+              : u
+          )
+        : [...prev, novoUsuario];
       saveUsuarios(upd);
       return upd;
     });
@@ -122,6 +134,8 @@ export default function App() {
       ? oss
       : usuario.papel === "cliente"
       ? oss.filter((o) => o.companyId === usuario.companyId && o.clienteId === usuario.clienteId)
+      : usuario.papel === "colaborador"
+      ? oss.filter((o) => o.colaboradorId === usuario.id)
       : oss.filter((o) => o.companyId === usuario.companyId);
 
   return (
@@ -188,6 +202,7 @@ export default function App() {
             setOss={handleAddOS}
             onFim={() => setAba("oss")}
             clientes={clientes}
+            usuarios={usuarios}
           />
         )}
         {aba === "colaboradores" && usuario.papel === "confeccao" && (
@@ -220,6 +235,7 @@ export default function App() {
           usuario={usuario}
           fechar={() => setModal(null)}
           atualizar={handleUpdateOS}
+          usuarios={usuarios}
         />
       )}
     </div>

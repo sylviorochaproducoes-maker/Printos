@@ -12,9 +12,11 @@ function PapelTag({ papel }) {
 export default function Sidebar({ usuario, aba, setAba, sair, empresas = [], menuAberto, fecharMenu }) {
   const obterNomeEmpresa = () => {
     if (usuario.papel === "superadmin") return "Portal PrintOS";
-    if (!usuario.companyId) return "Portal Confecção";
-    const emp = empresas.find(e => e.id === usuario.companyId);
-    return emp ? emp.nome : "Minha Confecção";
+    const ids = usuario.companyIds || (usuario.companyId ? [usuario.companyId] : []);
+    if (ids.length === 0) return "Portal Confecção";
+    const matched = empresas.filter(e => ids.includes(e.id)).map(e => e.nome);
+    if (matched.length > 1) return `${matched.length} Confecções`;
+    return matched[0] || "Minha Confecção";
   };
 
   const nav = {

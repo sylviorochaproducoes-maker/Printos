@@ -7,26 +7,49 @@ export default function Colaboradores({ usuario, usuarios = [], onAddUser }) {
   const [mostrarForm, setMostrarForm] = useState(false);
   const [salvo, setSalvo] = useState(false);
 
-  // Filtrar colaboradores da empresa atual
+  const [erro, setErro] = useState("");
+
+  // Filtrar colaboradores da empresa atual (verificando se o ID da empresa está na lista do usuário)
   const colaboradores = usuarios.filter(
-    (u) => u.companyId === usuario.companyId && u.papel === "colaborador"
+    (u) => u.papel === "colaborador" && (u.companyIds && u.companyIds.includes(usuario.companyId))
   );
 
   const cadastrarColaborador = () => {
     if (!nome.trim() || !login.trim() || !senha.trim()) return;
+    setErro("");
 
-    // Gerar novo ID de usuário
-    const proximoId = usuarios.reduce((max, u) => Math.max(max, typeof u.id === "number" ? u.id : 0), 0) + 1;
-    const novoColaborador = {
-      id: proximoId,
-      login: login.trim().toLowerCase(),
-      senha: senha.trim(),
-      papel: "colaborador",
-      nome: nome.trim(),
-      companyId: usuario.companyId
-    };
+    const loginLower = login.trim().toLowerCase();
+    const existente = usuarios.find((u) => u.login.toLowerCase() === loginLower);
 
-    onAddUser(novoColaborador);
+    if (existente) {
+      if (existente.papel !== "colaborador") {
+        setErro("Este login já está sendo usado por outro tipo de usuário.");
+        return;
+      }
+      const ids = existente.companyIds || (existente.companyId ? [existente.companyId] : []);
+      if (ids.includes(usuario.companyId)) {
+        setErro("Este colaborador já está cadastrado nesta confecção.");
+        return;
+      }
+      // Associar colaborador existente a mais uma empresa
+      const colaboradorAtualizado = {
+        ...existente,
+        companyIds: [...ids, usuario.companyId]
+      };
+      onAddUser(colaboradorAtualizado);
+    } else {
+      // Criar novo colaborador
+      const proximoId = usuarios.reduce((max, u) => Math.max(max, typeof u.id === "number" ? u.id : 0), 0) + 1;
+      const novoColaborador = {
+        id: proximoId,
+        login: loginLower,
+        senha: senha.trim(),
+        papel: "colaborador",
+        nome: nome.trim(),
+        companyIds: [usuario.companyId]
+      };
+      onAddUser(novoColaborador);
+    }
 
     setSalvo(true);
     setTimeout(() => {
@@ -35,6 +58,7 @@ export default function Colaboradores({ usuario, usuarios = [], onAddUser }) {
       setNome("");
       setLogin("");
       setSenha("");
+      setErro("");
     }, 1500);
   };
 
@@ -102,6 +126,12 @@ export default function Colaboradores({ usuario, usuarios = [], onAddUser }) {
                 />
               </div>
             </div>
+
+            {erro && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 flex items-center gap-2 mt-2">
+                ⚠️ {erro}
+              </p>
+            )}
 
             <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
               <button

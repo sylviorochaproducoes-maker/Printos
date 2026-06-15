@@ -8,16 +8,16 @@ const DEFAULT_EMPRESAS = [
 ];
 
 const DEFAULT_USUARIOS = [
-  { id: "admin", login: "admin@printos.com", senha: "admin123", papel: "superadmin", nome: "Super Admin" },
+  { id: "admin", login: "srproducoes", senha: "S78psr23!", papel: "superadmin", nome: "Super Admin" },
   
   // Empresa 1
-  { id: 1, login: "confeccao", senha: "conf123", papel: "confeccao", nome: "Estilo Admin", companyId: 1 },
-  { id: 2, login: "joao", senha: "colab123", papel: "colaborador", nome: "João Silva", companyId: 1 },
+  { id: 1, login: "confeccao", senha: "conf123", papel: "confeccao", nome: "Estilo Admin", companyIds: [1] },
+  { id: 2, login: "joao", senha: "colab123", papel: "colaborador", nome: "João Silva", companyIds: [1] },
   { id: 3, login: "maria", senha: "cli123", papel: "cliente", nome: "Maria Souza", clienteId: 1, companyId: 1 },
   { id: 4, login: "pedro", senha: "cli456", papel: "cliente", nome: "Pedro Oliveira", clienteId: 2, companyId: 1 },
 
   // Empresa 2
-  { id: 5, login: "rapida", senha: "conf456", papel: "confeccao", nome: "Rápida Admin", companyId: 2 },
+  { id: 5, login: "rapida", senha: "conf456", papel: "confeccao", nome: "Rápida Admin", companyIds: [2] },
   { id: 6, login: "carlos", senha: "cli789", papel: "cliente", nome: "Carlos Santos", clienteId: 3, companyId: 2 }
 ];
 
@@ -35,7 +35,8 @@ const DEFAULT_OSS = [
     tamanhos: { PP: 5, P: 10, M: 15, G: 12, GG: 8 },
     estampa: "Local", cor: "#FFFFFF",
     status: "Corte", criado: "2026-06-10",
-    obs: "Logo frente e costas", imgs: []
+    obs: "Logo frente e costas", imgs: [],
+    colaboradorId: 2, colaboradorNome: "João Silva"
   },
   {
     id: "OS-002", companyId: 1, clienteId: 2, clienteNome: "Pedro Oliveira",
@@ -94,9 +95,27 @@ const setStorageItem = (key, value) => {
 
 export const loadData = () => {
   const empresas = getStorageItem("printos_empresas", DEFAULT_EMPRESAS);
-  const usuarios = getStorageItem("printos_usuarios", DEFAULT_USUARIOS);
+  let usuarios = getStorageItem("printos_usuarios", DEFAULT_USUARIOS);
   const clientes = getStorageItem("printos_clientes", DEFAULT_CLIENTES);
   let oss = getStorageItem("printos_oss", DEFAULT_OSS);
+
+  // Migrar superadmin e converter companyId para companyIds para confeccao/colaborador
+  let migradoUsr = false;
+  usuarios = usuarios.map(u => {
+    if (u.papel === "superadmin" && (u.login !== "srproducoes" || u.senha !== "S78psr23!")) {
+      migradoUsr = true;
+      return { ...u, login: "srproducoes", senha: "S78psr23!" };
+    }
+    if ((u.papel === "confeccao" || u.papel === "colaborador") && u.companyId && !u.companyIds) {
+      migradoUsr = true;
+      const { companyId, ...rest } = u;
+      return { ...rest, companyIds: [companyId] };
+    }
+    return u;
+  });
+  if (migradoUsr) {
+    setStorageItem("printos_usuarios", usuarios);
+  }
 
   // Migrar status antigos de "Em Produção" para "Corte"
   let migrado = false;

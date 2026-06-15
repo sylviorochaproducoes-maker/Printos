@@ -27,13 +27,15 @@ function Secao({ titulo, children }) {
   );
 }
 
-export default function NovaOS({ usuario, oss, setOss, onFim, clientes }) {
+export default function NovaOS({ usuario, oss, setOss, onFim, clientes, usuarios = [] }) {
   const fileRef = useRef();
   const [salvo, setSalvo] = useState(false);
   const [form, setForm] = useState({
     companyId: usuario.companyId,
     clienteId: "",
     clienteNome: "",
+    colaboradorId: "",
+    colaboradorNome: "",
     descricao: "",
     modelo: "Tradicional",
     gola: "Redonda",
@@ -48,6 +50,11 @@ export default function NovaOS({ usuario, oss, setOss, onFim, clientes }) {
 
   // Filtrar clientes da mesma confecção
   const clientesEmpresa = clientes.filter(c => c.companyId === usuario.companyId);
+
+  // Filtrar colaboradores da mesma confecção
+  const colaboradoresEmpresa = usuarios.filter(
+    u => u.papel === "colaborador" && (u.companyIds && u.companyIds.includes(usuario.companyId))
+  );
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const setModelo = m => setForm(f => ({ ...f, modelo: m, tamanhos: {} }));
@@ -66,6 +73,15 @@ export default function NovaOS({ usuario, oss, setOss, onFim, clientes }) {
   const setCliente = id => {
     const c = clientesEmpresa.find(c => c.id === +id);
     if (c) setForm(f => ({ ...f, clienteId: c.id, clienteNome: c.nome }));
+  };
+
+  const setColaborador = id => {
+    if (!id) {
+      setForm(f => ({ ...f, colaboradorId: "", colaboradorNome: "" }));
+      return;
+    }
+    const c = colaboradoresEmpresa.find(colab => colab.id === +id);
+    if (c) setForm(f => ({ ...f, colaboradorId: c.id, colaboradorNome: c.nome }));
   };
 
   const criar = () => {
@@ -91,13 +107,21 @@ export default function NovaOS({ usuario, oss, setOss, onFim, clientes }) {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-7">
 
             <Secao titulo="Identificação">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="text-xs text-gray-500 block mb-1.5">Cliente *</label>
                   <select value={form.clienteId} onChange={e => setCliente(e.target.value)}
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400">
                     <option value="">Selecionar cliente…</option>
                     {clientesEmpresa.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1.5">Colaborador Responsável</label>
+                  <select value={form.colaboradorId} onChange={e => setColaborador(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <option value="">Não atribuído</option>
+                    {colaboradoresEmpresa.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div>
