@@ -75,7 +75,7 @@ export default function SuperAdmin({ empresas = [], usuarios = [], onAddCompany,
 
       <div className="p-6 space-y-6">
         {/* KPI Cards */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-rose-500 to-rose-700 rounded-2xl p-5 text-white shadow-md">
             <div className="text-3xl mb-3">🏢</div>
             <div className="text-4xl font-black">{totalEmpresas}</div>
@@ -109,7 +109,7 @@ export default function SuperAdmin({ empresas = [], usuarios = [], onAddCompany,
             {/* Seção Empresa */}
             <div className="space-y-4">
               <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">1. Dados da Empresa</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 block mb-1.5">Nome da Confecção *</label>
                   <input
@@ -135,7 +135,7 @@ export default function SuperAdmin({ empresas = [], usuarios = [], onAddCompany,
             {/* Seção Administrador */}
             <div className="space-y-4 pt-2">
               <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">2. Conta do Administrador da Confecção</p>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 block mb-1.5">Nome Completo *</label>
                   <input
@@ -193,8 +193,8 @@ export default function SuperAdmin({ empresas = [], usuarios = [], onAddCompany,
         {/* Lista de Empresas */}
         <div>
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Empresas Cadastradas</p>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto w-full">
+            <table className="w-full text-sm min-w-[650px]">
               <thead className="bg-gray-50 border-b border-gray-100 text-[10px] uppercase tracking-widest font-bold text-gray-400">
                 <tr>
                   <th className="text-left px-5 py-3">ID</th>

@@ -130,8 +130,8 @@ export default function Colaboradores({ usuario, usuarios = [], onAddUser }) {
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
             Sua Equipe ({colaboradores.length})
           </p>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden max-w-3xl">
-            <table className="w-full text-sm">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto w-full max-w-3xl">
+            <table className="w-full text-sm min-w-[600px]">
               <thead className="bg-gray-50 border-b border-gray-100 text-[10px] uppercase tracking-widest font-bold text-gray-400">
                 <tr>
                   <th className="text-left px-5 py-3">#</th>

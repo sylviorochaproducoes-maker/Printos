@@ -9,7 +9,7 @@ function PapelTag({ papel }) {
   return <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border ${c}`}>{l}</span>;
 }
 
-export default function Sidebar({ usuario, aba, setAba, sair, empresas = [] }) {
+export default function Sidebar({ usuario, aba, setAba, sair, empresas = [], menuAberto, fecharMenu }) {
   const obterNomeEmpresa = () => {
     if (usuario.papel === "superadmin") return "Portal PrintOS";
     if (!usuario.companyId) return "Portal Confecção";
@@ -31,9 +31,13 @@ export default function Sidebar({ usuario, aba, setAba, sair, empresas = [] }) {
   }[usuario.papel] || [];
 
   return (
-    <aside className="w-56 bg-slate-950 text-white flex flex-col h-screen sticky top-0 shrink-0 border-r border-slate-900 shadow-xl">
+    <aside
+      className={`fixed md:sticky top-0 bottom-0 left-0 z-50 w-56 bg-slate-950 text-white flex flex-col h-screen shrink-0 border-r border-slate-900 shadow-xl transition-transform duration-300 ease-in-out ${
+        menuAberto ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      }`}
+    >
       {/* Brand Header */}
-      <div className="px-5 py-4 border-b border-white/5">
+      <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span className="text-2xl animate-pulse">👕</span>
           <div>
@@ -41,6 +45,12 @@ export default function Sidebar({ usuario, aba, setAba, sair, empresas = [] }) {
             <p className="text-[10px] text-slate-500 font-medium">Confecção & Estampagem</p>
           </div>
         </div>
+        <button
+          onClick={fecharMenu}
+          className="md:hidden w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+        >
+          ✕
+        </button>
       </div>
 
       {/* User Information */}

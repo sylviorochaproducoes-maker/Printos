@@ -89,7 +89,7 @@ export default function Clientes({ usuario, clientes = [], usuarios = [], onAddC
             {/* Dados Contato */}
             <div className="space-y-4">
               <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">1. Informações de Contato</p>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="text-xs text-gray-500 block mb-1.5">Nome Completo *</label>
                   <input value={nome} onChange={e => setNome(e.target.value)}
@@ -114,7 +114,7 @@ export default function Clientes({ usuario, clientes = [], usuarios = [], onAddC
             {/* Conta do Cliente */}
             <div className="space-y-4 pt-2">
               <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest">2. Credenciais de Acesso do Cliente</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 block mb-1.5">Usuário/Login *</label>
                   <input value={login} onChange={e => setLogin(e.target.value)}
@@ -157,8 +157,8 @@ export default function Clientes({ usuario, clientes = [], usuarios = [], onAddC
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
             Seus Clientes ({clientesFiltrados.length})
           </p>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden max-w-3xl">
-            <table className="w-full text-sm">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden overflow-x-auto w-full max-w-3xl">
+            <table className="w-full text-sm min-w-[600px]">
               <thead className="bg-gray-50 border-b border-gray-100 text-[10px] uppercase tracking-widest font-bold text-gray-400">
                 <tr>
                   <th className="text-left px-4 py-3">#</th>

@@ -18,7 +18,7 @@ export default function Dashboard({ oss }) {
         <p className="text-sm text-gray-400 mt-0.5">Visão geral da produção</p>
       </div>
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {stats.map(c => (
             <div key={c.l} className={`bg-gradient-to-br ${c.g} rounded-2xl p-5 text-white shadow-md`}>
               <div className="text-3xl mb-3">{c.icon}</div>

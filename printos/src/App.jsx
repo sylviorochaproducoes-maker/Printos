@@ -19,6 +19,7 @@ export default function App() {
   const [usuario, setUsuario] = useState(null);
   const [aba, setAba] = useState("dashboard");
   const [modal, setModal] = useState(null);
+  const [menuAberto, setMenuAberto] = useState(false);
 
   // Estados Globais
   const [empresas, setEmpresas] = useState([]);
@@ -52,6 +53,7 @@ export default function App() {
     setUsuario(null);
     setAba("dashboard");
     setModal(null);
+    setMenuAberto(false);
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -83,7 +85,6 @@ export default function App() {
   };
 
   const handleAddOS = (setter) => {
-    // Quando usamos setOss(prev => ...) no NovaOS
     if (typeof setter === "function") {
       setOss((prev) => {
         const upd = setter(prev);
@@ -124,15 +125,45 @@ export default function App() {
       : oss.filter((o) => o.companyId === usuario.companyId);
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen bg-slate-50 overflow-hidden relative">
+      {/* Mobile Top Header */}
+      <header className="md:hidden h-14 bg-slate-950 text-white flex items-center justify-between px-4 z-30 shrink-0 shadow-md">
+        <button
+          onClick={() => setMenuAberto(true)}
+          className="text-2xl focus:outline-none p-1"
+        >
+          ☰
+        </button>
+        <span className="font-black text-sm tracking-tight">PrintOS</span>
+        <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-indigo-600/80 text-white">
+          {usuario.nome.split(" ")[0]}
+        </span>
+      </header>
+
+      {/* Drawer Overlay for Mobile */}
+      {menuAberto && (
+        <div
+          onClick={() => setMenuAberto(false)}
+          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
+        />
+      )}
+
+      {/* Sidebar Navigation */}
       <Sidebar
         usuario={usuario}
         aba={aba}
-        setAba={setAba}
+        setAba={(novaAba) => {
+          setAba(novaAba);
+          setMenuAberto(false); // Fecha o menu lateral no celular ao trocar de aba
+        }}
         sair={sair}
         empresas={empresas}
+        menuAberto={menuAberto}
+        fecharMenu={() => setMenuAberto(false)}
       />
-      <main className="flex-1 overflow-y-auto">
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto w-full">
         {/* Super Admin */}
         {aba === "empresas" && usuario.papel === "superadmin" && (
           <SuperAdmin
