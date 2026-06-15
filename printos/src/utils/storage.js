@@ -34,7 +34,7 @@ const DEFAULT_OSS = [
     gola: "Redonda", manga: "Manga Curta – Tradicional",
     tamanhos: { PP: 5, P: 10, M: 15, G: 12, GG: 8 },
     estampa: "Local", cor: "#FFFFFF",
-    status: "Em Produção", criado: "2026-06-10",
+    status: "Corte", criado: "2026-06-10",
     obs: "Logo frente e costas", imgs: []
   },
   {
@@ -96,7 +96,21 @@ export const loadData = () => {
   const empresas = getStorageItem("printos_empresas", DEFAULT_EMPRESAS);
   const usuarios = getStorageItem("printos_usuarios", DEFAULT_USUARIOS);
   const clientes = getStorageItem("printos_clientes", DEFAULT_CLIENTES);
-  const oss = getStorageItem("printos_oss", DEFAULT_OSS);
+  let oss = getStorageItem("printos_oss", DEFAULT_OSS);
+
+  // Migrar status antigos de "Em Produção" para "Corte"
+  let migrado = false;
+  oss = oss.map(o => {
+    if (o.status === "Em Produção") {
+      migrado = true;
+      return { ...o, status: "Corte" };
+    }
+    return o;
+  });
+
+  if (migrado) {
+    setStorageItem("printos_oss", oss);
+  }
 
   return { empresas, usuarios, clientes, oss };
 };

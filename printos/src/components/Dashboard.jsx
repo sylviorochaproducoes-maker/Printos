@@ -5,10 +5,13 @@ export default function Dashboard({ oss }) {
   const stats = [
     { l: "Total de OSs",    v: oss.length,                                      icon: "📋", g: "from-indigo-500 to-indigo-700"  },
     { l: "Aguardando Arte", v: oss.filter(o => o.status === "Aguardando Arte").length, icon: "⏳", g: "from-amber-500 to-amber-700"   },
-    { l: "Em Produção",     v: oss.filter(o => o.status === "Em Produção").length,     icon: "🔄", g: "from-orange-500 to-orange-700" },
+    { l: "Arte Aprovada",   v: oss.filter(o => o.status === "Arte Aprovada").length,   icon: "🎨", g: "from-blue-500 to-blue-700"     },
+    { l: "Corte",           v: oss.filter(o => o.status === "Corte").length,           icon: "✂️", g: "from-orange-500 to-orange-700" },
+    { l: "Estampa",         v: oss.filter(o => o.status === "Estampa").length,         icon: "👕", g: "from-pink-500 to-pink-700"     },
+    { l: "Costura",         v: oss.filter(o => o.status === "Costura").length,         icon: "🪡", g: "from-violet-500 to-violet-700" },
     { l: "Finalizado",      v: oss.filter(o => o.status === "Finalizado").length,      icon: "✅", g: "from-emerald-500 to-emerald-700"},
     { l: "Entregue",        v: oss.filter(o => o.status === "Entregue").length,        icon: "🚚", g: "from-slate-600 to-slate-800"   },
-    { l: "Total de Peças",  v: oss.reduce((s, o) => s + somarTam(o.tamanhos), 0),     icon: "👕", g: "from-violet-500 to-violet-700" },
+    { l: "Total de Peças",  v: oss.reduce((s, o) => s + somarTam(o.tamanhos), 0),     icon: "📦", g: "from-cyan-500 to-cyan-700"     },
   ];
 
   return (
