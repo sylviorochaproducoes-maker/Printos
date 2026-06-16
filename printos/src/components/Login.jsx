@@ -82,6 +82,23 @@ export default function Login({ onLogin, usuarios = [], empresas = [] }) {
     );
 
     if (u) {
+      // Verificar se a empresa está ativa
+      if (u.papel === "confeccao" || u.papel === "cliente") {
+        const comp = empresas.find(e => e.id === u.companyId);
+        if (comp && comp.status !== "Ativo") {
+          setErro(`Acesso bloqueado: A empresa "${comp.nome}" está desativada ou com pendências financeiras.`);
+          setCarregando(false);
+          return;
+        }
+      } else if (u.papel === "colaborador") {
+        const ids = u.companyIds || (u.companyId ? [u.companyId] : []);
+        const ativas = empresas.filter(e => ids.includes(e.id) && e.status === "Ativo");
+        if (ativas.length === 0) {
+          setErro("Acesso bloqueado: Todas as empresas às quais você está associado estão desativadas.");
+          setCarregando(false);
+          return;
+        }
+      }
       onLogin(u);
     } else {
       setErro(
@@ -108,6 +125,23 @@ export default function Login({ onLogin, usuarios = [], empresas = [] }) {
           user.senha === senha
       );
       if (u) {
+        // Verificar se a empresa está ativa
+        if (u.papel === "confeccao" || u.papel === "cliente") {
+          const comp = empresas.find(e => e.id === u.companyId);
+          if (comp && comp.status !== "Ativo") {
+            setErro(`Acesso bloqueado: A empresa "${comp.nome}" está desativada ou com pendências financeiras.`);
+            setCarregando(false);
+            return;
+          }
+        } else if (u.papel === "colaborador") {
+          const ids = u.companyIds || (u.companyId ? [u.companyId] : []);
+          const ativas = empresas.filter(e => ids.includes(e.id) && e.status === "Ativo");
+          if (ativas.length === 0) {
+            setErro("Acesso bloqueado: Todas as empresas às quais você está associado estão desativadas.");
+            setCarregando(false);
+            return;
+          }
+        }
         onLogin(u);
       } else {
         setErro("Usuário ou senha incorretos.");

@@ -68,6 +68,14 @@ export default function App() {
     });
   };
 
+  const handleUpdateCompany = (empresaAtualizada) => {
+    setEmpresas((prev) => {
+      const upd = prev.map((e) => (e.id === empresaAtualizada.id ? empresaAtualizada : e));
+      saveEmpresas(upd);
+      return upd;
+    });
+  };
+
   const handleAddUser = (novoUsuario) => {
     setUsuarios((prev) => {
       const exists = prev.some(
@@ -135,7 +143,11 @@ export default function App() {
       : usuario.papel === "cliente"
       ? oss.filter((o) => o.companyId === usuario.companyId && o.clienteId === usuario.clienteId)
       : usuario.papel === "colaborador"
-      ? oss.filter((o) => o.colaboradorId === usuario.id)
+      ? oss.filter((o) => {
+          const comp = empresas.find(e => e.id === o.companyId);
+          const compAtiva = comp && comp.status === "Ativo";
+          return o.colaboradorId === usuario.id && compAtiva;
+        })
       : oss.filter((o) => o.companyId === usuario.companyId);
 
   return (
@@ -183,8 +195,10 @@ export default function App() {
           <SuperAdmin
             empresas={empresas}
             usuarios={usuarios}
+            clientes={clientes}
             onAddCompany={handleAddCompany}
             onAddUser={handleAddUser}
+            onUpdateCompany={handleUpdateCompany}
           />
         )}
 
